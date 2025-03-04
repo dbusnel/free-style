@@ -1,12 +1,15 @@
-import "../style/profile-styles.css";
+"use client"
 
-//this will use data from database so should be server rendered for speed
+import "../style/profile-styles.css";
+import React from "react";
+import ImageSlider from "./ImageSlider";
 
 export default function ProfileView(props) {
     return (
         <div className="profile-view-outline-container">
             <h1>{props.name}</h1>
-            <img src={props.image} alt={props.name} />
+            <p>{props.bio}</p>
+            <ImageSlider bio={props.bio} images={props.images} />
         </div>
     );
 }

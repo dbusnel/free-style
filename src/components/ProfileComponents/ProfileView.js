@@ -1,8 +1,8 @@
 "use client"
 
-import "../style/profile-styles.css";
+import "../../style/profile-styles.css";
 import React from "react";
-import ImageSlider from "./ImageSlider";
+import ImageSlider from "./ImageSlider.js";
 
 export default function ProfileView(props) {
     return (

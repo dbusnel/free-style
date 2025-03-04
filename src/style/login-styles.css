@@ -1,0 +1,22 @@
+.login-container 
+{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    row-gap: 10px;
+    flex-direction: column;
+}
+
+.spaced-item
+{
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+    width: 40%;
+}
+
+.login-button 
+{
+    width: 40%;
+}

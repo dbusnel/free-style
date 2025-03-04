@@ -1,8 +1,8 @@
 "use client"
 
-import "../style/profile-styles.css";
+import "../../style/profile-styles.css";
 import React from "react";
-import CurrentImageIndicator from "./CurrentImageIndicator";
+import CurrentImageIndicator from "./CurrentImageIndicator.js";
 
 export default function ImageSlider(props) {
     const [currentImageIndex, setCurrentImageIndex] = React.useState(0);

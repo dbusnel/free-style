@@ -1,6 +1,6 @@
 "use client"
 
-import "../style/profile-styles.css";
+import "../../style/profile-styles.css";
 
 /**
  * Display a provided number of dots with an indicated current image index.

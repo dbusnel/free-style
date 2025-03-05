@@ -15,8 +15,14 @@ export default function LoginForm()
                 <input type="password" id="password" name="password"></input>
                 <br/>
                 <div style={{display:"flex", justifyContent:"space-between"}}>
-                    <button onClick={async () => SendRegisterRequest()} className="login-button" type="register">Register</button>
-                    <button className="login-button" type="login">Login</button>
+                    <button 
+                        onClick={async () => SendRegisterRequest()} 
+                        className="login-button" 
+                        type="register">Register</button>
+                    <button 
+                        onClick={async () => SendLoginRequest()}
+                        className="login-button" 
+                        type="login">Login</button>
                 </div>
             </div>
         </div>
@@ -32,4 +38,14 @@ async function SendRegisterRequest() {
             .then(res => res.json())
             .then(data => console.log(data)); //TODO: indicate success or failure to user
 
+}
+
+async function SendLoginRequest() {
+    let res = 
+        await fetch("/api/login", 
+            {method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({username: document.getElementById("username").value, passwordPlaintext: document.getElementById("password").value})})
+            .then(res => res.json())
+            .then(data => console.log(data)); //TODO: indicate success or failure to user
 }

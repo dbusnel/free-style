@@ -1,5 +1,7 @@
 import { supabase } from "../../../lib/supabase";
 import { hash } from "../utils";
+import { deleteExpiredSessions, postSession } from "./createSession.js";
+import { serialize } from 'cookie';
 
 const bcrypt = require('bcrypt');
 
@@ -12,21 +14,33 @@ const bcrypt = require('bcrypt');
  *  - passwordPlaintext : The password in plaintext
  */
 export async function POST(request) {
-    let requstData = (await request.json());
+    let requestData = (await request.json());
 
-    console.log(requstData.passwordPlaintext);
+    console.log(requestData.passwordPlaintext);
 
     const { data: response, error } = await supabase
         .from('USERS')
         .select('password_hash')
-        .eq('username', requstData.username)
+        .eq('username', requestData.username)
         .single();
 
         console.log(response);
 
     if (response) //User exists and we got a response
     {
-        return handleLogin(requstData.passwordPlaintext, response.password_hash);
+        //returns body and status. We still need to make the cookie before serialzing response
+        let loginStatus = handleLogin(requestData.passwordPlaintext, response.password_hash);
+        
+        //post new session to the database (4 hr expiration)
+        let guid = await postSession(await getIDFromUsername(requestData.username));
+        let sessionCookie = createSessionCookie(guid);
+
+        //make the full response and return!
+        return (new Response(
+            JSON.stringify({message : loginStatus.message}), //body
+            {
+                status: loginStatus.status, 
+                headers: {'Set-Cookie': sessionCookie, 'Content-Type': 'application/json'}}));
     }
     else //API could not be connected to, or user does not exist
     {
@@ -38,12 +52,54 @@ export async function POST(request) {
 
 function handleLogin(passwordPlaintext, passwordHash) {
     let bPasswordMatch = bcrypt.compareSync(passwordPlaintext, passwordHash);
-        
-        if (!bPasswordMatch) {
-            console.error("Passwords do not match");
-            return new Response(JSON.stringify({message:"Passwords do not match"}), {status: 401});
-        } 
-        else {
-            return new Response(JSON.stringify({message: "Logged in successfully!"}), {status: 200});
+    
+    // If the passwords match, create a new session and add it to the database
+    // then, on the client side, create a cookie with the session ID
+    if (!bPasswordMatch) {
+        console.error("Passwords do not match");
+        return {message : "Passwords do not match", status: 401};
+    } 
+    else {
+        return {message: "Logged in successfully!", status: 200};
+    }
+}
+
+function createSessionCookie(guid) {
+    const sessionCookie = serialize(
+        'session_id', guid,
+        {
+            httpOnly: true, //prevent XSS attacks
+            secure: true,   //only send over HTTPS
+            sameSite: 'strict', 
+            maxAge: 60 * 60 * 4, //expire in 4 hours (number of seconds)
+            path: '/'
         }
+    );
+
+    return sessionCookie;
+}
+
+async function getIDFromUsername(username) {
+    try 
+    {
+        const { data: response, error } = await supabase
+            .from('USERS')
+            .select('id')
+            .eq('username', username)
+            .single();
+
+        console.log(response.id);
+
+        if (error) //database error
+        {
+            console.error(error);
+            return null;
+        }
+
+        return response.id;
+
+    } catch (error) //if database stops working for whatever reason
+    {
+        console.error(error);
+    }
 }

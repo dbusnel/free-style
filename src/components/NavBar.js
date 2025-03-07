@@ -10,7 +10,7 @@ export default function NavBar() {
             <div className="nav-bar">
                 <a href="/">Home</a>
                 <a href="/login">Login</a>
-                <a href="/contact">Contact</a>
+                <a href="/create">Create</a>
             </div>
             <br/>
         </div>

@@ -5,6 +5,12 @@ import React from "react";
 import ImageSlider from "./ImageSlider.js";
 import CommentSection from "./CommentSection";
 
+/**
+ * PROPS:
+ *  - name: the name of the user
+ *  - bio: the bio to display
+ *  - images: an array of image URLs to display
+ */
 export default function ProfileView(props) {
     return (
         <div className="profile-view-container outline-container">
